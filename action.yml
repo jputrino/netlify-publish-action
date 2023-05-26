@@ -1,0 +1,18 @@
+name: 'Scheduled Netlify Deploys'
+description: |
+  Finds the current locked deploy on the production branch, unlocks it, publishes the most recent production deploy, and locks publishing to that deploy.
+inputs:
+  netlify-auth-token: 
+    description: Your Netlify Personal Access Token (PAT)
+    required: true
+  netlify-site-id: 
+    description: The API ID of your Netlify Site
+    required: true
+outputs:
+  lockedDeployID:
+    description: The ID of the locked production deploy
+  latestDeployID:
+    description: The ID of the most recent deploy on the production branch
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
