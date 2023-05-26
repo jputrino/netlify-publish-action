@@ -1,0 +1,19 @@
+name: 'Scheduled Netlify Deploys'
+description: |
+  Finds the current locked deploy on the production branch, unlocks it, publishes the most recent production deploy, and locks publishing to that deploy.
+on: push
+env: 
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  NETLIFY_TEST_SITE_ID: ${{ secrets.NETLIFY_TEST_SITE_ID }}
+  BUILD_HOOK: ${{ secrets.BUILD_HOOK }}
+inputs:
+  netlify-auth-token: NETLIFY_AUTH_TOKEN
+  netlify-site-id: NETLIFY_TEST_SITE_ID
+outputs:
+  lockedDeployID:
+    description: The ID of the locked production deploy
+  latestDeployID:
+    description: The ID of the most recent deploy on the production branch
+runs:
+  using: 'node16'
+  main: 'index.js'
