@@ -18,12 +18,14 @@ The Action does the following:
 4. Sends a POST request to `/sites/{siteID}/deploys/{deployID}/restoreSiteDeploy` where `{deployID}` is the id returned in the previous step.
 5. Sends a POST request to `/sites/{siteID}/deploys/{deployID}/lock` where `{deployID}` is the same id returned in step 3.
 
-## Usage
+## Inputs
 
-The Action requires the following inputs:
+The Action **requires** the following inputs:
 
 - `netlify-auth-token`: Your Netlify PAT.
 - `netlify-site-id`: The API Site ID for your Netlify Site.
+
+## Outputs
 
 The Action returns the following outputs:
 
@@ -40,4 +42,21 @@ with:
     netlify-auth-token: 'NETLIFY_AUTH_TOKEN'
     netlify-site-id: 'NETLIFY_SITE_ID'
 ```
-    
+
+## Packaging
+
+This project uses [@vercel/ncc](https://github.com/vercel/ncc) for compilation. 
+
+### Installation
+
+```bash
+npm i -g @vercel/ncc
+```
+
+### Compilation
+
+```bash
+ncc build index.js --license licenses.txt   
+```
+
+> Note: This is based on the guidance provided in the [GitHub Docs for creating a javascript action](https://docs.github.com/en/actions/creating-actions/creating-a-javascript-action#writing-the-action-code).
