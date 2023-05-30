@@ -32,15 +32,24 @@ The Action returns the following outputs:
 - `lockedDeployID`: The ID of the locked production deploy.
 - `latestDeployID`: The ID of the most recent deploy on the production branch.
 
-The Action can be scheduled using the cron syntax.
-
 Example:
 
 ```yaml
-uses: jputrino/netlify-publish-action@latest
-with:
-    netlify-auth-token: 'NETLIFY_AUTH_TOKEN'
-    netlify-site-id: 'NETLIFY_SITE_ID'
+jobs:
+  netlify_deploy_job:
+    runs-on: ubuntu-latest
+    name: Unlock latest production deploy
+    steps:
+      - name: Unlock and publish netlify deploys
+        id: deploy
+        uses: jputrino/netlify-publish-action@v0.2.0
+        with:
+          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+      - name: Get the outputs
+        run: |
+          echo "Successfully unlocked deploy ${{ steps.deploy.outputs.lockedDeployID}}"   
+          echo "Successfully published and locked deploy ${{ steps.deploy.outputs.latestDeployID}}"    
 ```
 
 ## Packaging

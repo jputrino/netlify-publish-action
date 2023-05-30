@@ -9429,8 +9429,8 @@ async function getRequest(url) {
     });
     return response.data;
   } catch (error) {
-    throw new Error(`GET request to ${url} failed: ${error.message}`);
-  }
+    core.setFailed(`GET request to ${url} failed: ${error.message}`);
+    }
 }
 
 // Function to send POST request
@@ -9443,7 +9443,7 @@ async function postRequest(url) {
     });
     return response.data;
   } catch (error) {
-    throw new Error(`POST request to ${url} failed: ${error.message}`);
+    core.setFailed(`POST request to ${url} failed: ${error.message}`);
   }
 }
 
@@ -9489,6 +9489,7 @@ async function publishLatestDeploy(siteID) {
 
     if (!lockedDeploy) {
       throw new Error('No locked deploy found.');
+      core.setFailed('Error: Did not find a locked deploy in the provided Netlify Site.')
     }
 
     const lockedDeployID = lockedDeploy.id;
@@ -9505,6 +9506,7 @@ async function publishLatestDeploy(siteID) {
 
     if (!recentDeploy) {
       throw new Error('No recent production deploy found.');
+      core.setFailed('Error: Did not find any production deploys in the provided Netlify Site.')
     }
 
     const recentDeployID = recentDeploy.id;
@@ -9521,6 +9523,7 @@ async function publishLatestDeploy(siteID) {
 
   } catch (error) {
     console.error('Error:', error.message);
+    core.setFailed(`Error: ${error.message}`)
   }
 }
 
