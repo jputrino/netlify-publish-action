@@ -9426,7 +9426,15 @@ async function getRequest(url) {
       headers: {
         authorization: `Bearer ${accessToken}`
       }
+    }) 
+    .then(function (response) {
+      console.log(response.data);
+      console.log(response.status);
+      console.log(response.statusText);
+      console.log(response.headers);
+      console.log(response.config);
     });
+    
     return response.data;
   } catch (error) {
     core.setFailed(`GET request to ${url} failed: ${error.message}`);
@@ -9483,10 +9491,10 @@ async function publishLatestDeploy(siteID) {
 
   try {
     // Step 1: Get currently locked deploy
-    const deploysUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys`;
+    const filterParams = "latest-published=true"
+    const deploysUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys?${filterParams}`;
     const deploysResponse = await getRequest(deploysUrl);
-    console.log(deploysResponse)
-    const lockedDeploy = deploysResponse.find(deploy => deploy.locked);
+    const lockedDeploy = deploysResponse.find();
 
     if (!lockedDeploy) {
       throw new Error('No locked deploy found.');
