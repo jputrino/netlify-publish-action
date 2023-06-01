@@ -9424,7 +9424,7 @@ async function getRequest(url) {
   try {
     const response = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        authorization: `Bearer ${accessToken}`
       }
     });
     return response.data;
@@ -9438,7 +9438,7 @@ async function postRequest(url) {
   try {
     const response = await axios.post(url, null, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        authorization: `Bearer ${accessToken}`
       }
     });
     return response.data;
@@ -9485,6 +9485,7 @@ async function publishLatestDeploy(siteID) {
     // Step 1: Get currently locked deploy
     const deploysUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys`;
     const deploysResponse = await getRequest(deploysUrl);
+    console.log(deploysResponse)
     const lockedDeploy = deploysResponse.find(deploy => deploy.locked);
 
     if (!lockedDeploy) {
