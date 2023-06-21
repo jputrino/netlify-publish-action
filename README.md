@@ -49,23 +49,21 @@ jobs:
       - name: Get the outputs
         run: |
           echo "Successfully unlocked deploy ${{ steps.deploy.outputs.lockedDeployID}}"   
-          echo "Successfully published and locked deploy ${{ steps.deploy.outputs.latestDeployID}}"    
+          echo "Successfully published and locked deploy ${{ steps.deploy.outputs.latestDeployID}}"
 ```
 
 ## Packaging
 
-This project uses [@vercel/ncc](https://github.com/vercel/ncc) for compilation. 
+This project uses [@vercel/ncc](https://github.com/vercel/ncc) for compilation.
 
 ### Installation
 
 ```bash
-npm i -g @vercel/ncc
+npm i
 ```
 
 ### Compilation
 
 ```bash
-ncc build index.js --license licenses.txt   
+npm run all
 ```
-
-> Note: This is based on the guidance provided in the [GitHub Docs for creating a javascript action](https://docs.github.com/en/actions/creating-actions/creating-a-javascript-action#writing-the-action-code).
