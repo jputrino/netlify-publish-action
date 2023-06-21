@@ -2,9 +2,11 @@ import axios, { type AxiosError, type AxiosInstance } from "axios";
 import { ActionMetadata, Core, Deploy } from "./types";
 
 class NetlifyClient {
+  // These are local variables to this class that are set in the constructor
   private _actionMetadata: ActionMetadata;
-  private _client: AxiosInstance;
+  private _client: AxiosInstance; // This is the variable available to the class that contains the axios client that we will use to make requests. Instead of using axios.get, we will use this._client.get
 
+  // This creates an axios client with the correct headers and error handling
   private static create = (core: Core, actionMetadata: ActionMetadata) => {
     const { accessToken } = actionMetadata;
     const client = axios.create({
@@ -39,10 +41,13 @@ class NetlifyClient {
     return client;
   };
 
+  // This is the constructor that initializes this class and creates the underlying axios client
   public constructor(core: Core, actionMetadata: ActionMetadata) {
     this._actionMetadata = actionMetadata;
     this._client = NetlifyClient.create(core, actionMetadata);
   }
+
+  // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
 
   public async getDeploys() {
     const { siteID } = this._actionMetadata;

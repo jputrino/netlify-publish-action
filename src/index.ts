@@ -4,7 +4,7 @@ import {
   getLockedDeployID,
   getLatestDeployID,
 } from "./logic";
-import NetlifyClient from "./netlifyClient";
+import NetlifyClient from "./NetlifyClient";
 
 const main = async () => {
   core.debug(`GitHub Event Name: ${process.env.GITHUB_EVENT_NAME}`);
