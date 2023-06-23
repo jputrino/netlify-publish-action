@@ -63,7 +63,6 @@ class NetlifyClient {
   }
 
   public async unlockDeploy(deployID: string, config?: AxiosRequestConfig) {
-    const { siteID } = this._actionMetadata;
     await this._client.post(`/deploys/${deployID}/unlock`, undefined, config);
     console.log(`Deploy ${deployID} unlocked successfully.`);
   }
@@ -82,7 +81,6 @@ class NetlifyClient {
   }
 
   public async lockDeploy(deployID: string, config?: AxiosRequestConfig) {
-    const { siteID } = this._actionMetadata;
     await this._client.post(`/deploys/${deployID}/lock`, undefined, config);
     console.log(`Deploy locked successfully to ${deployID}`);
   }
