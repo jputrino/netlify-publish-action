@@ -18,21 +18,24 @@ const main = async () => {
   const client = new NetlifyClient(core, actionMetadata);
 
   // This is using one of the functions mentioned above to get the deploys for the site
-  const deploys = await client.getDeploys();
+  const latestPublishedDeploys = await client.getDeploys({
+    params: { "latest-published": "true" },
+  });
+  const latestDeploys = await client.getDeploys();
 
   // Gets IDs for the locked and latest deploys
-  const lockedDeployId = getLockedDeployID(core, deploys);
-  const latestDeployID = getLatestDeployID(core, deploys);
+  const lockedDeployID = getLockedDeployID(core, latestPublishedDeploys);
+  const latestDeployID = getLatestDeployID(core, latestDeploys);
 
   // Unlocks the existing deployment
-  await client.unlockDeploy(lockedDeployId);
+  await client.unlockDeploy(lockedDeployID);
   // Updates the production site with the latest deploy
   await client.restoreSiteDeploy(latestDeployID);
   // Locks to this deployment
   await client.lockDeploy(latestDeployID);
 
   // As a final step, provides GitHub Action outputs upon success
-  core.setOutput("lockedDeployID", lockedDeployId);
+  core.setOutput("lockedDeployID", lockedDeployID);
   core.setOutput("latestDeployID", latestDeployID);
 };
 

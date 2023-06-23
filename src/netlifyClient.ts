@@ -1,4 +1,8 @@
-import axios, { type AxiosError, type AxiosInstance } from "axios";
+import axios, {
+  type AxiosRequestConfig,
+  type AxiosError,
+  type AxiosInstance,
+} from "axios";
 import { ActionMetadata, Core, Deploy } from "./types";
 
 class NetlifyClient {
@@ -49,32 +53,37 @@ class NetlifyClient {
 
   // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
 
-  public async getDeploys() {
+  public async getDeploys(config?: AxiosRequestConfig) {
     const { siteID } = this._actionMetadata;
     const { data } = await this._client.get<Deploy[]>(
       `/sites/${siteID}/deploys`,
-      {
-        params: { "latest-published": "true" },
-      }
+      config
     );
     return data;
   }
 
-  public async unlockDeploy(deployID: string) {
+  public async unlockDeploy(deployID: string, config?: AxiosRequestConfig) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(`/deploys/${deployID}/unlock`);
+    await this._client.post(`/deploys/${deployID}/unlock`, undefined, config);
     console.log(`Deploy ${deployID} unlocked successfully.`);
   }
 
-  public async restoreSiteDeploy(deployID: string) {
+  public async restoreSiteDeploy(
+    deployID: string,
+    config?: AxiosRequestConfig
+  ) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(`/sites/${siteID}/deploys/${deployID}/restore`);
+    await this._client.post(
+      `/sites/${siteID}/deploys/${deployID}/restore`,
+      undefined,
+      config
+    );
     console.log(`Deploy published to production site: ${deployID}`);
   }
 
-  public async lockDeploy(deployID: string) {
+  public async lockDeploy(deployID: string, config?: AxiosRequestConfig) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(`/deploys/${deployID}/lock`);
+    await this._client.post(`/deploys/${deployID}/lock`, undefined, config);
     console.log(`Deploy locked successfully to ${deployID}`);
   }
 }
