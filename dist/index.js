@@ -36,7 +36,6 @@ class NetlifyClient {
     }
     unlockDeploy(deployID, config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
             yield this._client.post(`/deploys/${deployID}/unlock`, undefined, config);
             console.log(`Deploy ${deployID} unlocked successfully.`);
         });
@@ -50,7 +49,6 @@ class NetlifyClient {
     }
     lockDeploy(deployID, config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
             yield this._client.post(`/deploys/${deployID}/lock`, undefined, config);
             console.log(`Deploy locked successfully to ${deployID}`);
         });
