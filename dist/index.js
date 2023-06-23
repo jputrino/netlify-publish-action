@@ -1,6 +1,227 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 2905:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const axios_1 = __importDefault(__nccwpck_require__(8757));
+class NetlifyClient {
+    // This is the constructor that initializes this class and creates the underlying axios client
+    constructor(core, actionMetadata) {
+        this._actionMetadata = actionMetadata;
+        this._client = NetlifyClient.create(core, actionMetadata);
+    }
+    // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
+    getDeploys() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            const { data } = yield this._client.get(`/sites/${siteID}/deploys`, {
+                params: { "latest-published": "true" },
+            });
+            return data;
+        });
+    }
+    unlockDeploy(deployID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/unlock`);
+            console.log(`Deploy ${deployID} unlocked successfully.`);
+        });
+    }
+    restoreSiteDeploy(deployID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/restoreSiteDeploy`);
+            console.log(`Deploy published to production site: ${deployID}`);
+        });
+    }
+    lockDeploy(deployID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/lock`);
+            console.log(`Deploy locked successfully to ${deployID}`);
+        });
+    }
+}
+// This creates an axios client with the correct headers and error handling
+NetlifyClient.create = (core, actionMetadata) => {
+    const { accessToken } = actionMetadata;
+    const client = axios_1.default.create({
+        baseURL: "https://api.netlify.com/api/v1",
+        headers: {
+            authorization: `Bearer ${accessToken}`,
+        },
+    });
+    client.interceptors.response.use((response) => {
+        console.log(response.data);
+        console.log(response.status);
+        console.log(response.statusText);
+        console.log(response.headers);
+        console.log(response.config);
+        return response;
+    }, (error) => {
+        var _a;
+        if ((_a = error.config) === null || _a === void 0 ? void 0 : _a.url) {
+            core.setFailed(`${error.config.method || "API"} request to ${error.config.url} failed: ${error.message}`);
+        }
+        core.setFailed(`API request failed: ${error.message}`);
+        return Promise.reject(error);
+    });
+    return client;
+};
+exports["default"] = NetlifyClient;
+
+
+/***/ }),
+
+/***/ 4822:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const logic_1 = __nccwpck_require__(2197);
+const NetlifyClient_1 = __importDefault(__nccwpck_require__(2905));
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    core.debug(`GitHub Event Name: ${process.env.GITHUB_EVENT_NAME}`);
+    // Gets GitHub Action inputs
+    const actionMetadata = (0, logic_1.getActionMetadata)(core);
+    // Creates an axios instance with the provided Netlify auth token
+    // This will intercept all requests and send the token in the authorization header and log the errors/responses automatically
+    // The client is modified with custom functions to interact with the Netlify API to make this cleaner
+    const client = new NetlifyClient_1.default(core, actionMetadata);
+    // This is using one of the functions mentioned above to get the deploys for the site
+    const deploys = yield client.getDeploys();
+    // Gets IDs for the locked and latest deploys
+    const lockedDeployId = (0, logic_1.getLockedDeployID)(core, deploys);
+    const latestDeployID = (0, logic_1.getLatestDeployID)(core, deploys);
+    // Unlocks the existing deployment
+    yield client.unlockDeploy(lockedDeployId);
+    // Updates the production site with the latest deploy
+    yield client.restoreSiteDeploy(latestDeployID);
+    // Locks to this deployment
+    yield client.lockDeploy(latestDeployID);
+    // As a final step, provides GitHub Action outputs upon success
+    core.setOutput("lockedDeployID", lockedDeployId);
+    core.setOutput("latestDeployID", latestDeployID);
+});
+try {
+    main();
+}
+catch (error) {
+    if (error instanceof Error) {
+        core.setFailed(error.message);
+        console.error("Error:", error.message);
+    }
+    else {
+        core.setFailed("Unknown error occurred");
+        console.error("Unknown error occurred");
+    }
+}
+
+
+/***/ }),
+
+/***/ 2197:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getLatestDeployID = exports.getLockedDeployID = exports.getActionMetadata = void 0;
+const getActionMetadata = (core) => {
+    const actionMetadata = {
+        accessToken: core.getInput("netlify-auth-token"),
+        siteID: core.getInput("netlify-site-id"),
+    };
+    if (actionMetadata.siteID === "") {
+        core.setFailed("Error: Netlify Auth Token not provided.");
+        throw new Error("Netlify Auth Token not found. You must provide this as an Action input.");
+    }
+    if (actionMetadata.siteID === "") {
+        core.setFailed("Error: No site ID provided.");
+        throw new Error("Netlify Site ID is not defined. You must provide this as an Action input.");
+    }
+    return actionMetadata;
+};
+exports.getActionMetadata = getActionMetadata;
+const getLockedDeployID = (core, deploys) => {
+    const lockedDeploy = deploys.find((deploy) => deploy.locked);
+    if (!lockedDeploy) {
+        core.setFailed("Error: Did not find a locked deploy in the provided Netlify Site.");
+        throw new Error("No locked deploy found.");
+    }
+    const lockedDeployID = lockedDeploy.id;
+    console.log("Currently locked deploy ID:", lockedDeployID);
+    return lockedDeployID;
+};
+exports.getLockedDeployID = getLockedDeployID;
+const getLatestDeployID = (core, deploys) => {
+    const latestDeploy = deploys.find((deploy) => deploy.context === "production");
+    if (!latestDeploy) {
+        core.setFailed("Error: Did not find any production deploys in the provided Netlify Site.");
+        throw new Error("No recent production deploy found.");
+    }
+    const latestDeployID = latestDeploy.id;
+    console.log("Latest production deploy ID:", latestDeployID);
+    return latestDeployID;
+};
+exports.getLatestDeployID = getLatestDeployID;
+
+
+/***/ }),
+
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -4979,206 +5200,6 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 5537:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const axios_1 = __importDefault(__nccwpck_require__(8757));
-class NetlifyClient {
-    // This is the constructor that initializes this class and creates the underlying axios client
-    constructor(core, actionMetadata) {
-        this._actionMetadata = actionMetadata;
-        this._client = NetlifyClient.create(core, actionMetadata);
-    }
-    // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
-    getDeploys() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
-            const { data } = yield this._client.get(`/sites/${siteID}/deploys`, {
-                params: { "latest-published": "true" },
-            });
-            return data;
-        });
-    }
-    unlockDeploy(deployID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
-            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/unlock`);
-            console.log(`Deploy ${deployID} unlocked successfully.`);
-        });
-    }
-    restoreSiteDeploy(deployID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
-            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/restoreSiteDeploy`);
-            console.log(`Deploy published to production site: ${deployID}`);
-        });
-    }
-    lockDeploy(deployID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { siteID } = this._actionMetadata;
-            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/lock`);
-            console.log(`Deploy locked successfully to ${deployID}`);
-        });
-    }
-}
-// This creates an axios client with the correct headers and error handling
-NetlifyClient.create = (core, actionMetadata) => {
-    const { accessToken } = actionMetadata;
-    const client = axios_1.default.create({
-        baseURL: "https://api.netlify.com/api/v1",
-        headers: {
-            authorization: `Bearer ${accessToken}`,
-        },
-    });
-    client.interceptors.response.use((response) => {
-        console.log(response.data);
-        console.log(response.status);
-        console.log(response.statusText);
-        console.log(response.headers);
-        console.log(response.config);
-        return response;
-    }, (error) => {
-        var _a;
-        if ((_a = error.config) === null || _a === void 0 ? void 0 : _a.url) {
-            core.setFailed(`${error.config.method || "API"} request to ${error.config.url} failed: ${error.message}`);
-        }
-        core.setFailed(`API request failed: ${error.message}`);
-        return Promise.reject(error);
-    });
-    return client;
-};
-exports["default"] = NetlifyClient;
-
-
-/***/ }),
-
-/***/ 6144:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const logic_1 = __nccwpck_require__(5684);
-const NetlifyClient_1 = __importDefault(__nccwpck_require__(5537));
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.default.debug(`GitHub Event Name: ${process.env.GITHUB_EVENT_NAME}`);
-    // Gets GitHub Action inputs
-    const actionMetadata = (0, logic_1.getActionMetadata)(core_1.default);
-    // Creates an axios instance with the provided Netlify auth token
-    // This will intercept all requests and send the token in the authorization header and log the errors/responses automatically
-    // The client is modified with custom functions to interact with the Netlify API to make this cleaner
-    const client = new NetlifyClient_1.default(core_1.default, actionMetadata);
-    // This is using one of the functions mentioned above to get the deploys for the site
-    const deploys = yield client.getDeploys();
-    // Gets IDs for the locked and latest deploys
-    const lockedDeployId = (0, logic_1.getLockedDeployID)(core_1.default, deploys);
-    const latestDeployID = (0, logic_1.getLatestDeployID)(core_1.default, deploys);
-    // Unlocks the existing deployment
-    yield client.unlockDeploy(lockedDeployId);
-    // Updates the production site with the latest deploy
-    yield client.restoreSiteDeploy(latestDeployID);
-    // Locks to this deployment
-    yield client.lockDeploy(latestDeployID);
-    // As a final step, provides GitHub Action outputs upon success
-    core_1.default.setOutput("lockedDeployID", lockedDeployId);
-    core_1.default.setOutput("latestDeployID", latestDeployID);
-});
-try {
-    main();
-}
-catch (error) {
-    if (error instanceof Error) {
-        core_1.default.setFailed(error.message);
-        console.error("Error:", error.message);
-    }
-    else {
-        core_1.default.setFailed("Unknown error occurred");
-        console.error("Unknown error occurred");
-    }
-}
-
-
-/***/ }),
-
-/***/ 5684:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLatestDeployID = exports.getLockedDeployID = exports.getActionMetadata = void 0;
-const getActionMetadata = (core) => {
-    const actionMetadata = {
-        accessToken: core.getInput("netlify-auth-token"),
-        siteID: core.getInput("netlify-site-id"),
-    };
-    if (actionMetadata.siteID === "") {
-        core.setFailed("Error: Netlify Auth Token not provided.");
-        throw new Error("Netlify Auth Token not found. You must provide this as an Action input.");
-    }
-    if (actionMetadata.siteID === "") {
-        core.setFailed("Error: No site ID provided.");
-        throw new Error("Netlify Site ID is not defined. You must provide this as an Action input.");
-    }
-    return actionMetadata;
-};
-exports.getActionMetadata = getActionMetadata;
-const getLockedDeployID = (core, deploys) => {
-    const lockedDeploy = deploys.find((deploy) => deploy.locked);
-    if (!lockedDeploy) {
-        core.setFailed("Error: Did not find a locked deploy in the provided Netlify Site.");
-        throw new Error("No locked deploy found.");
-    }
-    const lockedDeployID = lockedDeploy.id;
-    console.log("Currently locked deploy ID:", lockedDeployID);
-    return lockedDeployID;
-};
-exports.getLockedDeployID = getLockedDeployID;
-const getLatestDeployID = (core, deploys) => {
-    const latestDeploy = deploys.find((deploy) => deploy.context === "production");
-    if (!latestDeploy) {
-        // core.setFailed(
-        //   "Error: Did not find any production deploys in the provided Netlify Site."
-        // );
-        throw new Error("No recent production deploy found.");
-    }
-    const latestDeployID = latestDeploy.id;
-    console.log("Latest production deploy ID:", latestDeployID);
-    return latestDeployID;
-};
-exports.getLatestDeployID = getLatestDeployID;
-
-
-/***/ }),
-
 /***/ 9975:
 /***/ ((module) => {
 
@@ -9594,7 +9615,7 @@ module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

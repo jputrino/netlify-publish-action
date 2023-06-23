@@ -2,10 +2,10 @@
   "name": "netlify-publish-action",
   "version": "0.1.0",
   "description": "A test repo for developing a scheduled Action to trigger Netlify deploys",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt",
+    "package": "ncc build lib/index.js --source-map --license licenses.txt",
     "all": "npm run build && npm run package"
   },
   "repository": {

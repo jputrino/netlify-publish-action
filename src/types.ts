@@ -1,4 +1,4 @@
-import type CoreType from "@actions/core";
+import type * as CoreType from "@actions/core";
 
 export type Core = typeof CoreType;
 
