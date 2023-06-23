@@ -27,33 +27,31 @@ class NetlifyClient {
         this._client = NetlifyClient.create(core, actionMetadata);
     }
     // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
-    getDeploys() {
+    getDeploys(config) {
         return __awaiter(this, void 0, void 0, function* () {
             const { siteID } = this._actionMetadata;
-            const { data } = yield this._client.get(`/sites/${siteID}/deploys`, {
-                params: { "latest-published": "true" },
-            });
+            const { data } = yield this._client.get(`/sites/${siteID}/deploys`, config);
             return data;
         });
     }
-    unlockDeploy(deployID) {
+    unlockDeploy(deployID, config) {
         return __awaiter(this, void 0, void 0, function* () {
             const { siteID } = this._actionMetadata;
-            yield this._client.post(`/deploys/${deployID}/unlock`);
+            yield this._client.post(`/deploys/${deployID}/unlock`, undefined, config);
             console.log(`Deploy ${deployID} unlocked successfully.`);
         });
     }
-    restoreSiteDeploy(deployID) {
+    restoreSiteDeploy(deployID, config) {
         return __awaiter(this, void 0, void 0, function* () {
             const { siteID } = this._actionMetadata;
-            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/restore`);
+            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/restore`, undefined, config);
             console.log(`Deploy published to production site: ${deployID}`);
         });
     }
-    lockDeploy(deployID) {
+    lockDeploy(deployID, config) {
         return __awaiter(this, void 0, void 0, function* () {
             const { siteID } = this._actionMetadata;
-            yield this._client.post(`/deploys/${deployID}/lock`);
+            yield this._client.post(`/deploys/${deployID}/lock`, undefined, config);
             console.log(`Deploy locked successfully to ${deployID}`);
         });
     }
@@ -142,18 +140,21 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // The client is modified with custom functions to interact with the Netlify API to make this cleaner
     const client = new NetlifyClient_1.default(core, actionMetadata);
     // This is using one of the functions mentioned above to get the deploys for the site
-    const deploys = yield client.getDeploys();
+    const latestPublishedDeploys = yield client.getDeploys({
+        params: { "latest-published": "true" },
+    });
+    const latestDeploys = yield client.getDeploys();
     // Gets IDs for the locked and latest deploys
-    const lockedDeployId = (0, logic_1.getLockedDeployID)(core, deploys);
-    const latestDeployID = (0, logic_1.getLatestDeployID)(core, deploys);
+    const lockedDeployID = (0, logic_1.getLockedDeployID)(core, latestPublishedDeploys);
+    const latestDeployID = (0, logic_1.getLatestDeployID)(core, latestDeploys);
     // Unlocks the existing deployment
-    yield client.unlockDeploy(lockedDeployId);
+    yield client.unlockDeploy(lockedDeployID);
     // Updates the production site with the latest deploy
     yield client.restoreSiteDeploy(latestDeployID);
     // Locks to this deployment
     yield client.lockDeploy(latestDeployID);
     // As a final step, provides GitHub Action outputs upon success
-    core.setOutput("lockedDeployID", lockedDeployId);
+    core.setOutput("lockedDeployID", lockedDeployID);
     core.setOutput("latestDeployID", latestDeployID);
 });
 try {
