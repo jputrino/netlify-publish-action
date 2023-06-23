@@ -64,6 +64,8 @@ npm i
 
 ### Compilation
 
-```bash
-npm run all
-```
+1. Remove the `dist` and `lib` folders.
+
+2. ```bash
+   npm run all
+   ```
