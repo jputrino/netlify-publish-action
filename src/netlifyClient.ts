@@ -62,21 +62,19 @@ class NetlifyClient {
 
   public async unlockDeploy(deployID: string) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(`/sites/${siteID}/deploys/${deployID}/unlock`);
+    await this._client.post(`/deploys/${deployID}/unlock`);
     console.log(`Deploy ${deployID} unlocked successfully.`);
   }
 
   public async restoreSiteDeploy(deployID: string) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(
-      `/sites/${siteID}/deploys/${deployID}/restoreSiteDeploy`
-    );
+    await this._client.post(`/sites/${siteID}/deploys/${deployID}/restore`);
     console.log(`Deploy published to production site: ${deployID}`);
   }
 
   public async lockDeploy(deployID: string) {
     const { siteID } = this._actionMetadata;
-    await this._client.post(`/sites/${siteID}/deploys/${deployID}/lock`);
+    await this._client.post(`/deploys/${deployID}/lock`);
     console.log(`Deploy locked successfully to ${deployID}`);
   }
 }
