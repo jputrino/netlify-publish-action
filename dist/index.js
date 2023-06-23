@@ -1,7 +1,227 @@
-/******/ (() => { // webpackBootstrap
+require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 2690:
+/***/ 2905:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const axios_1 = __importDefault(__nccwpck_require__(8757));
+class NetlifyClient {
+    // This is the constructor that initializes this class and creates the underlying axios client
+    constructor(core, actionMetadata) {
+        this._actionMetadata = actionMetadata;
+        this._client = NetlifyClient.create(core, actionMetadata);
+    }
+    // LOGIC FUNCTIONS - these are the functions that will be used in the action to make API calls.
+    getDeploys(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            const { data } = yield this._client.get(`/sites/${siteID}/deploys`, config);
+            return data;
+        });
+    }
+    unlockDeploy(deployID, config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._client.post(`/deploys/${deployID}/unlock`, undefined, config);
+            console.log(`Deploy ${deployID} unlocked successfully.`);
+        });
+    }
+    restoreSiteDeploy(deployID, config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { siteID } = this._actionMetadata;
+            yield this._client.post(`/sites/${siteID}/deploys/${deployID}/restore`, undefined, config);
+            console.log(`Deploy published to production site: ${deployID}`);
+        });
+    }
+    lockDeploy(deployID, config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._client.post(`/deploys/${deployID}/lock`, undefined, config);
+            console.log(`Deploy locked successfully to ${deployID}`);
+        });
+    }
+}
+// This creates an axios client with the correct headers and error handling
+NetlifyClient.create = (core, actionMetadata) => {
+    const { accessToken } = actionMetadata;
+    const client = axios_1.default.create({
+        baseURL: "https://api.netlify.com/api/v1",
+        headers: {
+            authorization: `Bearer ${accessToken}`,
+        },
+    });
+    client.interceptors.response.use((response) => {
+        console.log(response.data);
+        console.log(response.status);
+        console.log(response.statusText);
+        console.log(response.headers);
+        console.log(response.config);
+        return response;
+    }, (error) => {
+        var _a;
+        if ((_a = error.config) === null || _a === void 0 ? void 0 : _a.url) {
+            core.setFailed(`${error.config.method || "API"} request to ${error.config.url} failed: ${error.message}`);
+        }
+        core.setFailed(`API request failed: ${error.message}`);
+        return Promise.reject(error);
+    });
+    return client;
+};
+exports["default"] = NetlifyClient;
+
+
+/***/ }),
+
+/***/ 4822:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const logic_1 = __nccwpck_require__(2197);
+const NetlifyClient_1 = __importDefault(__nccwpck_require__(2905));
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    core.debug(`GitHub Event Name: ${process.env.GITHUB_EVENT_NAME}`);
+    // Gets GitHub Action inputs
+    const actionMetadata = (0, logic_1.getActionMetadata)(core);
+    // Creates an axios instance with the provided Netlify auth token
+    // This will intercept all requests and send the token in the authorization header and log the errors/responses automatically
+    // The client is modified with custom functions to interact with the Netlify API to make this cleaner
+    const client = new NetlifyClient_1.default(core, actionMetadata);
+    // This is using one of the functions mentioned above to get the deploys for the site
+    const latestPublishedDeploys = yield client.getDeploys({
+        params: { "latest-published": "true" },
+    });
+    const latestDeploys = yield client.getDeploys();
+    // Gets IDs for the locked and latest deploys
+    const lockedDeployID = (0, logic_1.getLockedDeployID)(core, latestPublishedDeploys);
+    const latestDeployID = (0, logic_1.getLatestDeployID)(core, latestDeploys);
+    // Unlocks the existing deployment
+    yield client.unlockDeploy(lockedDeployID);
+    // Updates the production site with the latest deploy
+    yield client.restoreSiteDeploy(latestDeployID);
+    // Locks to this deployment
+    yield client.lockDeploy(latestDeployID);
+    // As a final step, provides GitHub Action outputs upon success
+    core.setOutput("lockedDeployID", lockedDeployID);
+    core.setOutput("latestDeployID", latestDeployID);
+});
+try {
+    main();
+}
+catch (error) {
+    if (error instanceof Error) {
+        core.setFailed(error.message);
+        console.error("Error:", error.message);
+    }
+    else {
+        core.setFailed("Unknown error occurred");
+        console.error("Unknown error occurred");
+    }
+}
+
+
+/***/ }),
+
+/***/ 2197:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getLatestDeployID = exports.getLockedDeployID = exports.getActionMetadata = void 0;
+const getActionMetadata = (core) => {
+    const actionMetadata = {
+        accessToken: core.getInput("netlify-auth-token"),
+        siteID: core.getInput("netlify-site-id"),
+    };
+    if (actionMetadata.siteID === "") {
+        core.setFailed("Error: Netlify Auth Token not provided.");
+        throw new Error("Netlify Auth Token not found. You must provide this as an Action input.");
+    }
+    if (actionMetadata.siteID === "") {
+        core.setFailed("Error: No site ID provided.");
+        throw new Error("Netlify Site ID is not defined. You must provide this as an Action input.");
+    }
+    return actionMetadata;
+};
+exports.getActionMetadata = getActionMetadata;
+const getLockedDeployID = (core, deploys) => {
+    const lockedDeploy = deploys.find((deploy) => deploy.locked);
+    if (!lockedDeploy) {
+        core.setFailed("Error: Did not find a locked deploy in the provided Netlify Site.");
+        throw new Error("No locked deploy found.");
+    }
+    const lockedDeployID = lockedDeploy.id;
+    console.log("Currently locked deploy ID:", lockedDeployID);
+    return lockedDeployID;
+};
+exports.getLockedDeployID = getLockedDeployID;
+const getLatestDeployID = (core, deploys) => {
+    const latestDeploy = deploys.find((deploy) => deploy.context === "production");
+    if (!latestDeploy) {
+        core.setFailed("Error: Did not find any production deploys in the provided Netlify Site.");
+        throw new Error("No recent production deploy found.");
+    }
+    const latestDeployID = latestDeploy.id;
+    console.log("Latest production deploy ID:", latestDeployID);
+    return latestDeployID;
+};
+exports.getLatestDeployID = getLatestDeployID;
+
+
+/***/ }),
+
+/***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -28,7 +248,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(2037));
-const utils_1 = __nccwpck_require__(353);
+const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
  *
@@ -100,7 +320,7 @@ function escapeProperty(s) {
 
 /***/ }),
 
-/***/ 9935:
+/***/ 2186:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -135,12 +355,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(2690);
-const file_command_1 = __nccwpck_require__(5898);
-const utils_1 = __nccwpck_require__(353);
+const command_1 = __nccwpck_require__(7351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(5278);
 const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
-const oidc_utils_1 = __nccwpck_require__(7901);
+const oidc_utils_1 = __nccwpck_require__(8041);
 /**
  * The code to exit an action
  */
@@ -425,17 +645,17 @@ exports.getIDToken = getIDToken;
 /**
  * Summary exports
  */
-var summary_1 = __nccwpck_require__(9050);
+var summary_1 = __nccwpck_require__(1327);
 Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () { return summary_1.summary; } }));
 /**
  * @deprecated use core.summary
  */
-var summary_2 = __nccwpck_require__(9050);
+var summary_2 = __nccwpck_require__(1327);
 Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
 /**
  * Path exports
  */
-var path_utils_1 = __nccwpck_require__(1341);
+var path_utils_1 = __nccwpck_require__(2981);
 Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
 Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
 Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
@@ -443,7 +663,7 @@ Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: funct
 
 /***/ }),
 
-/***/ 5898:
+/***/ 717:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -474,8 +694,8 @@ exports.prepareKeyValueMessage = exports.issueFileCommand = void 0;
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(7147));
 const os = __importStar(__nccwpck_require__(2037));
-const uuid_1 = __nccwpck_require__(1368);
-const utils_1 = __nccwpck_require__(353);
+const uuid_1 = __nccwpck_require__(5840);
+const utils_1 = __nccwpck_require__(5278);
 function issueFileCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -508,7 +728,7 @@ exports.prepareKeyValueMessage = prepareKeyValueMessage;
 
 /***/ }),
 
-/***/ 7901:
+/***/ 8041:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -524,9 +744,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(3658);
-const auth_1 = __nccwpck_require__(2660);
-const core_1 = __nccwpck_require__(9935);
+const http_client_1 = __nccwpck_require__(6255);
+const auth_1 = __nccwpck_require__(5526);
+const core_1 = __nccwpck_require__(2186);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
@@ -592,7 +812,7 @@ exports.OidcClient = OidcClient;
 
 /***/ }),
 
-/***/ 1341:
+/***/ 2981:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -657,7 +877,7 @@ exports.toPlatformPath = toPlatformPath;
 
 /***/ }),
 
-/***/ 9050:
+/***/ 1327:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -947,7 +1167,7 @@ exports.summary = _summary;
 
 /***/ }),
 
-/***/ 353:
+/***/ 5278:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -994,7 +1214,7 @@ exports.toCommandProperties = toCommandProperties;
 
 /***/ }),
 
-/***/ 2660:
+/***/ 5526:
 /***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
@@ -1082,7 +1302,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 
 /***/ }),
 
-/***/ 3658:
+/***/ 6255:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1120,8 +1340,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
 const http = __importStar(__nccwpck_require__(3685));
 const https = __importStar(__nccwpck_require__(5687));
-const pm = __importStar(__nccwpck_require__(9697));
-const tunnel = __importStar(__nccwpck_require__(7477));
+const pm = __importStar(__nccwpck_require__(9835));
+const tunnel = __importStar(__nccwpck_require__(4294));
 var HttpCodes;
 (function (HttpCodes) {
     HttpCodes[HttpCodes["OK"] = 200] = "OK";
@@ -1694,7 +1914,7 @@ const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCa
 
 /***/ }),
 
-/***/ 9697:
+/***/ 9835:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1777,20 +1997,20 @@ function isLoopbackAddress(host) {
 
 /***/ }),
 
-/***/ 2479:
+/***/ 4812:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 module.exports =
 {
-  parallel      : __nccwpck_require__(3041),
-  serial        : __nccwpck_require__(3223),
-  serialOrdered : __nccwpck_require__(8959)
+  parallel      : __nccwpck_require__(8210),
+  serial        : __nccwpck_require__(445),
+  serialOrdered : __nccwpck_require__(3578)
 };
 
 
 /***/ }),
 
-/***/ 106:
+/***/ 1700:
 /***/ ((module) => {
 
 // API
@@ -1826,10 +2046,10 @@ function clean(key)
 
 /***/ }),
 
-/***/ 6768:
+/***/ 2794:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var defer = __nccwpck_require__(8933);
+var defer = __nccwpck_require__(5295);
 
 // API
 module.exports = async;
@@ -1867,7 +2087,7 @@ function async(callback)
 
 /***/ }),
 
-/***/ 8933:
+/***/ 5295:
 /***/ ((module) => {
 
 module.exports = defer;
@@ -1900,11 +2120,11 @@ function defer(fn)
 
 /***/ }),
 
-/***/ 5854:
+/***/ 9023:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var async = __nccwpck_require__(6768)
-  , abort = __nccwpck_require__(106)
+var async = __nccwpck_require__(2794)
+  , abort = __nccwpck_require__(1700)
   ;
 
 // API
@@ -1982,7 +2202,7 @@ function runJob(iterator, key, item, callback)
 
 /***/ }),
 
-/***/ 511:
+/***/ 2474:
 /***/ ((module) => {
 
 // API
@@ -2026,11 +2246,11 @@ function state(list, sortMethod)
 
 /***/ }),
 
-/***/ 3043:
+/***/ 7942:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var abort = __nccwpck_require__(106)
-  , async = __nccwpck_require__(6768)
+var abort = __nccwpck_require__(1700)
+  , async = __nccwpck_require__(2794)
   ;
 
 // API
@@ -2062,12 +2282,12 @@ function terminator(callback)
 
 /***/ }),
 
-/***/ 3041:
+/***/ 8210:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var iterate    = __nccwpck_require__(5854)
-  , initState  = __nccwpck_require__(511)
-  , terminator = __nccwpck_require__(3043)
+var iterate    = __nccwpck_require__(9023)
+  , initState  = __nccwpck_require__(2474)
+  , terminator = __nccwpck_require__(7942)
   ;
 
 // Public API
@@ -2112,10 +2332,10 @@ function parallel(list, iterator, callback)
 
 /***/ }),
 
-/***/ 3223:
+/***/ 445:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var serialOrdered = __nccwpck_require__(8959);
+var serialOrdered = __nccwpck_require__(3578);
 
 // Public API
 module.exports = serial;
@@ -2136,12 +2356,12 @@ function serial(list, iterator, callback)
 
 /***/ }),
 
-/***/ 8959:
+/***/ 3578:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var iterate    = __nccwpck_require__(5854)
-  , initState  = __nccwpck_require__(511)
-  , terminator = __nccwpck_require__(3043)
+var iterate    = __nccwpck_require__(9023)
+  , initState  = __nccwpck_require__(2474)
+  , terminator = __nccwpck_require__(7942)
   ;
 
 // Public API
@@ -2218,12 +2438,12 @@ function descending(a, b)
 
 /***/ }),
 
-/***/ 5567:
+/***/ 5443:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var util = __nccwpck_require__(3837);
 var Stream = (__nccwpck_require__(2781).Stream);
-var DelayedStream = __nccwpck_require__(5230);
+var DelayedStream = __nccwpck_require__(8611);
 
 module.exports = CombinedStream;
 function CombinedStream() {
@@ -2433,7 +2653,7 @@ CombinedStream.prototype._emitError = function(err) {
 
 /***/ }),
 
-/***/ 5230:
+/***/ 8611:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var Stream = (__nccwpck_require__(2781).Stream);
@@ -2547,7 +2767,7 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
 
 /***/ }),
 
-/***/ 8367:
+/***/ 1133:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var debug;
@@ -2556,7 +2776,7 @@ module.exports = function () {
   if (!debug) {
     try {
       /* eslint global-require: off */
-      debug = __nccwpck_require__(96)("follow-redirects");
+      debug = __nccwpck_require__(9975)("follow-redirects");
     }
     catch (error) { /* */ }
     if (typeof debug !== "function") {
@@ -2569,7 +2789,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 4214:
+/***/ 7707:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var url = __nccwpck_require__(7310);
@@ -2578,7 +2798,7 @@ var http = __nccwpck_require__(3685);
 var https = __nccwpck_require__(5687);
 var Writable = (__nccwpck_require__(2781).Writable);
 var assert = __nccwpck_require__(9491);
-var debug = __nccwpck_require__(8367);
+var debug = __nccwpck_require__(1133);
 
 // Create handlers that pass events from native requests
 var events = ["abort", "aborted", "connect", "error", "socket", "timeout"];
@@ -3197,10 +3417,10 @@ module.exports.wrap = wrap;
 
 /***/ }),
 
-/***/ 3232:
+/***/ 4334:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var CombinedStream = __nccwpck_require__(5567);
+var CombinedStream = __nccwpck_require__(5443);
 var util = __nccwpck_require__(3837);
 var path = __nccwpck_require__(1017);
 var http = __nccwpck_require__(3685);
@@ -3208,9 +3428,9 @@ var https = __nccwpck_require__(5687);
 var parseUrl = (__nccwpck_require__(7310).parse);
 var fs = __nccwpck_require__(7147);
 var Stream = (__nccwpck_require__(2781).Stream);
-var mime = __nccwpck_require__(2277);
-var asynckit = __nccwpck_require__(2479);
-var populate = __nccwpck_require__(2372);
+var mime = __nccwpck_require__(3583);
+var asynckit = __nccwpck_require__(4812);
+var populate = __nccwpck_require__(7142);
 
 // Public API
 module.exports = FormData;
@@ -3705,7 +3925,7 @@ FormData.prototype.toString = function () {
 
 /***/ }),
 
-/***/ 2372:
+/***/ 7142:
 /***/ ((module) => {
 
 // populates missing values
@@ -3722,7 +3942,7 @@ module.exports = function(dst, src) {
 
 /***/ }),
 
-/***/ 9416:
+/***/ 7426:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /*!
@@ -3741,7 +3961,7 @@ module.exports = __nccwpck_require__(3765)
 
 /***/ }),
 
-/***/ 2277:
+/***/ 3583:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3759,7 +3979,7 @@ module.exports = __nccwpck_require__(3765)
  * @private
  */
 
-var db = __nccwpck_require__(9416)
+var db = __nccwpck_require__(7426)
 var extname = (__nccwpck_require__(1017).extname)
 
 /**
@@ -3937,7 +4157,7 @@ function populateMaps (extensions, types) {
 
 /***/ }),
 
-/***/ 9630:
+/***/ 3329:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4053,15 +4273,15 @@ exports.getProxyForUrl = getProxyForUrl;
 
 /***/ }),
 
-/***/ 7477:
+/***/ 4294:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = __nccwpck_require__(8162);
+module.exports = __nccwpck_require__(4219);
 
 
 /***/ }),
 
-/***/ 8162:
+/***/ 4219:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4333,7 +4553,7 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 1368:
+/***/ 5840:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4397,29 +4617,29 @@ Object.defineProperty(exports, "parse", ({
   }
 }));
 
-var _v = _interopRequireDefault(__nccwpck_require__(3258));
+var _v = _interopRequireDefault(__nccwpck_require__(8628));
 
-var _v2 = _interopRequireDefault(__nccwpck_require__(2559));
+var _v2 = _interopRequireDefault(__nccwpck_require__(6409));
 
-var _v3 = _interopRequireDefault(__nccwpck_require__(2872));
+var _v3 = _interopRequireDefault(__nccwpck_require__(5122));
 
-var _v4 = _interopRequireDefault(__nccwpck_require__(5034));
+var _v4 = _interopRequireDefault(__nccwpck_require__(9120));
 
-var _nil = _interopRequireDefault(__nccwpck_require__(6051));
+var _nil = _interopRequireDefault(__nccwpck_require__(5332));
 
-var _version = _interopRequireDefault(__nccwpck_require__(6630));
+var _version = _interopRequireDefault(__nccwpck_require__(1595));
 
-var _validate = _interopRequireDefault(__nccwpck_require__(6879));
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2992));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(3783));
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
 
-/***/ 1102:
+/***/ 4569:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4449,7 +4669,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 6051:
+/***/ 5332:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4464,7 +4684,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 3783:
+/***/ 2746:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4475,7 +4695,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(6879));
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4516,7 +4736,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 4557:
+/***/ 814:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4531,7 +4751,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 160:
+/***/ 807:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4562,7 +4782,7 @@ function rng() {
 
 /***/ }),
 
-/***/ 4850:
+/***/ 5274:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4592,7 +4812,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 2992:
+/***/ 8950:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4603,7 +4823,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(6879));
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4638,7 +4858,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 3258:
+/***/ 8628:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4649,9 +4869,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(160));
+var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2992));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4752,7 +4972,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 2559:
+/***/ 6409:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4763,9 +4983,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _v = _interopRequireDefault(__nccwpck_require__(810));
+var _v = _interopRequireDefault(__nccwpck_require__(5998));
 
-var _md = _interopRequireDefault(__nccwpck_require__(1102));
+var _md = _interopRequireDefault(__nccwpck_require__(4569));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4775,7 +4995,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 810:
+/***/ 5998:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4787,9 +5007,9 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = _default;
 exports.URL = exports.DNS = void 0;
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2992));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(3783));
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4860,7 +5080,7 @@ function _default(name, version, hashfunc) {
 
 /***/ }),
 
-/***/ 2872:
+/***/ 5122:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4871,9 +5091,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(160));
+var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2992));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4904,7 +5124,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 5034:
+/***/ 9120:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4915,9 +5135,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _v = _interopRequireDefault(__nccwpck_require__(810));
+var _v = _interopRequireDefault(__nccwpck_require__(5998));
 
-var _sha = _interopRequireDefault(__nccwpck_require__(4850));
+var _sha = _interopRequireDefault(__nccwpck_require__(5274));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4927,7 +5147,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 6879:
+/***/ 6900:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4938,7 +5158,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _regex = _interopRequireDefault(__nccwpck_require__(4557));
+var _regex = _interopRequireDefault(__nccwpck_require__(814));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4951,7 +5171,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 6630:
+/***/ 1595:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4962,7 +5182,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(6879));
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4979,7 +5199,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 96:
+/***/ 9975:
 /***/ ((module) => {
 
 module.exports = eval("require")("debug");
@@ -5099,20 +5319,20 @@ module.exports = require("zlib");
 
 /***/ }),
 
-/***/ 7437:
+/***/ 8757:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 // Axios v1.4.0 Copyright (c) 2023 Matt Zabriskie and contributors
 
 
-const FormData$1 = __nccwpck_require__(3232);
+const FormData$1 = __nccwpck_require__(4334);
 const url = __nccwpck_require__(7310);
-const proxyFromEnv = __nccwpck_require__(9630);
+const proxyFromEnv = __nccwpck_require__(3329);
 const http = __nccwpck_require__(3685);
 const https = __nccwpck_require__(5687);
 const util = __nccwpck_require__(3837);
-const followRedirects = __nccwpck_require__(4214);
+const followRedirects = __nccwpck_require__(7707);
 const zlib = __nccwpck_require__(9796);
 const stream = __nccwpck_require__(2781);
 const EventEmitter = __nccwpck_require__(2361);
@@ -9390,157 +9610,13 @@ module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-/** This script was initially generated by ChatGPT 4
- * Requested Actions:
- *  1) send a get request to /sites/{siteID}/deploys to find the currently locked deploy and capture the id returned in the response; siteID is a variable that requires input from the user
- *  2) Send a POST to /sites/{siteID}/deploys/{deployID}/unlock to unlock the deploy, where {deployID} is the id returned in the previous step; 
- *  3) Send a GET request to sites/{siteID}/deploys to find the most recent production deploy and capture the id returned in the response;
- *  4) Send a POST request to /sites/{siteID}/deploys/{deployID}/restoreSiteDeploy where {deployID} is the id returned in the previous step; 
- *  5) Send a POST to /site/{siteID}/deploys/{deployID}/lock where {deployID} is the same id returned in step 3
- */
-
-// Import the GitHub core actions
-const core = __nccwpck_require__(9935);
-
-// Added by me
-core.debug(`GitHub Event Name: ${process.env.GITHUB_EVENT_NAME}`);
-
-// Import the 'axios' library for making HTTP requests
-const axios = __nccwpck_require__(7437);
-
-// Gets the value of the 'netlify-auth-token' input set in the Action metadata
-// Added by me
-const accessToken = core.getInput('netlify-auth-token');
-
-// Gets the value of the Netlify Site ID input set in the Action metadata
-// Added by me
-const siteID = core.getInput('netlify-site-id');
-
-// Function to send GET request
-async function getRequest(url) {
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        authorization: `Bearer ${accessToken}`
-      }
-    }) 
-    .then(function (response) {
-      console.log(response.data);
-      console.log(response.status);
-      console.log(response.statusText);
-      console.log(response.headers);
-      console.log(response.config);
-    });
-    
-    return response.data;
-  } catch (error) {
-    core.setFailed(`GET request to ${url} failed: ${error.message}`);
-    }
-}
-
-// Function to send POST request
-async function postRequest(url) {
-  try {
-    const response = await axios.post(url, null, {
-      headers: {
-        authorization: `Bearer ${accessToken}`
-      }
-    });
-    return response.data;
-  } catch (error) {
-    core.setFailed(`POST request to ${url} failed: ${error.message}`);
-  }
-}
-
-// Function to unlock deploy
-async function unlockDeploy(siteID, deployID) {
-  const unlockUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys/${deployID}/unlock`;
-  await postRequest(unlockUrl);
-  console.log(`Deploy ${deployID} unlocked successfully.`);
-}
-
-// Function to restore site deploy
-async function restoreSiteDeploy(siteID, deployID) {
-  const restoreUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys/${deployID}/restoreSiteDeploy`;
-  await postRequest(restoreUrl);
-  console.log(`Deploy published to production site: ${deployID}`);
-}
-
-// Function to lock deploy
-async function lockDeploy(siteID, deployID) {
-  const lockUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys/${deployID}/lock`;
-  await postRequest(lockUrl);
-  console.log(`Deploy locked successfully to ${deployID}` );
-}
-
-// Main function to perform the steps
-async function publishLatestDeploy(siteID) {
-  // Added by me to fail if required inputs are missing
-  if (!siteID) {
-    throw new Error('Netlify Site ID is not defined. You must provide this as an Action input.');
-    core.setFailed('Error: No site ID provided.');
-  }  
-  
-  if (!accessToken) {
-    throw new Error('Netlify Auth Token not found. You must provide this as an Action input.');
-    core.setFailed('Error: Netlify Auth Token not provided.');
-  }
-
-  try {
-    // Step 1: Get currently locked deploy
-    const filterParams = "latest-published=true"
-    const deploysUrl = `https://api.netlify.com/api/v1/sites/${siteID}/deploys?${filterParams}`;
-    const deploysResponse = await getRequest(deploysUrl);
-    const lockedDeploy = deploysResponse.find();
-
-    if (!lockedDeploy) {
-      throw new Error('No locked deploy found.');
-      core.setFailed('Error: Did not find a locked deploy in the provided Netlify Site.')
-    }
-
-    const lockedDeployID = lockedDeploy.id;
-    console.log('Currently locked deploy ID:', lockedDeployID);
-    // Added by me; allows the lockedDeployID to be used as an output & 
-    // passed to other steps or jobs
-    core.setOutput("lockedDeployID", lockedDeployID);
-
-    // Step 2: Unlock deploy
-    await unlockDeploy(siteID, lockedDeployID);
-
-    // Step 3: Get most recent production deploy
-    const recentDeploy = deploysResponse.find(deploy => deploy.context === 'production');
-
-    if (!recentDeploy) {
-      throw new Error('No recent production deploy found.');
-      core.setFailed('Error: Did not find any production deploys in the provided Netlify Site.')
-    }
-
-    const recentDeployID = recentDeploy.id;
-    console.log('Most recent production deploy ID:', recentDeployID);
-    // Added by me; allows the latestDeployID to be used as an output & 
-    // passed to other steps or jobs
-    core.setOutput("latestDeployID", latestDeployID);
-
-    // Step 4: Restore site deploy
-    await restoreSiteDeploy(siteID, recentDeployID);
-
-    // Step 5: Lock deploy
-    await lockDeploy(siteID, recentDeployID);
-
-  } catch (error) {
-    console.error('Error:', error.message);
-    core.setFailed(`Error: ${error.message}`)
-  }
-}
-
-// Call the main function
-publishLatestDeploy(siteID);
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
+//# sourceMappingURL=index.js.map
