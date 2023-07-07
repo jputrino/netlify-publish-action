@@ -6,6 +6,8 @@ export interface Deploy {
   id: string;
   locked: boolean;
   context: string;
+  state: string;
+  permalink: string;
 }
 
 export interface ActionMetadata {

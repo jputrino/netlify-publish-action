@@ -6,7 +6,7 @@ export const getActionMetadata = (core: Core) => {
     siteID: core.getInput("netlify-site-id"),
   };
 
-  if (actionMetadata.siteID === "") {
+  if (actionMetadata.accessToken === "") {
     core.setFailed("Error: Netlify Auth Token not provided.");
     throw new Error(
       "Netlify Auth Token not found. You must provide this as an Action input."
@@ -29,6 +29,7 @@ export const getLockedDeployID = (core: Core, deploys: Deploy[]) => {
     core.setFailed(
       "Error: Did not find a locked deploy in the provided Netlify Site."
     );
+    console.log("Check the Netlify site settings to verify that deploys are locked.")
     throw new Error("No locked deploy found.");
   }
   const lockedDeployID = lockedDeploy.id;
@@ -38,7 +39,7 @@ export const getLockedDeployID = (core: Core, deploys: Deploy[]) => {
 
 export const getLatestDeployID = (core: Core, deploys: Deploy[]) => {
   const latestDeploy = deploys.find(
-    (deploy) => deploy.context === "production"
+      (deploy) => deploy.context === "production" && deploy.state === "ready"
   );
   if (!latestDeploy) {
     core.setFailed(
