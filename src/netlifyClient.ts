@@ -22,11 +22,11 @@ class NetlifyClient {
 
     client.interceptors.response.use(
       (response) => {
-        console.log(response.data);
         console.log(response.status);
         console.log(response.statusText);
         console.log(response.headers);
         console.log(response.config);
+        console.log(response.data);
         return response;
       },
       (error: AxiosError) => {
